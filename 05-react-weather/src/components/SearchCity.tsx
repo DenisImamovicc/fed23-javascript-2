@@ -1,19 +1,24 @@
 import { useState } from 'react';
 import { getCurrentWeather } from "../services/OWMAPI";
+import { WeatherReport } from '../services/OWMAPI.types';
 
-const SearchCity = () => {
+
+interface SearchCityProps {
+	handleSetWeatherRapport: (input: WeatherReport|null) => void
+}
+
+const SearchCity = ({handleSetWeatherRapport}:SearchCityProps) => {
     const [city, setCity] = useState("");
 
     const handleSearchFormSubmit = async(e:React.FormEvent) => {
         e.preventDefault();
-        let data;
-        
+
 		try {
-			data = await getCurrentWeather(city);
+			handleSetWeatherRapport(await getCurrentWeather(city))
 		} catch (error) {
 			alert("City not FOUND!")
+			handleSetWeatherRapport(null)
 		}
-        console.log(city,data);
 		setCity("")
     };
 
@@ -34,7 +39,7 @@ const SearchCity = () => {
                         value={city} 
                         onChange={handleInputChange}
 						required
-						pattern="^(?=.{3,})\S+$"
+						pattern="^(?=.{3,})\S+(?:\s+\S+)*$"
                     />
 
                     <button type="submit" className="btn btn-success">
