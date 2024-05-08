@@ -32,7 +32,9 @@ const SearchCity = () => {
                         aria-label="City"
                         aria-details="Search for city to show current weather for."
                         value={city} 
-                        onChange={handleInputChange} 
+                        onChange={handleInputChange}
+						required
+						pattern="^(?=.{3,})\S+$"
                     />
 
                     <button type="submit" className="btn btn-success">
