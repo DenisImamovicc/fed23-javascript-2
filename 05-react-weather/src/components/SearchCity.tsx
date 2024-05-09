@@ -1,54 +1,46 @@
-import { useState } from 'react';
-import { getCurrentWeather } from "../services/OWMAPI";
-import { WeatherReport } from '../services/OWMAPI.types';
-
+import { useState } from "react";
 
 interface SearchCityProps {
-	handleSetWeatherRapport: (input: WeatherReport|null) => void
+	onSearch: (location: string) => void;
 }
 
-const SearchCity = ({handleSetWeatherRapport}:SearchCityProps) => {
-    const [city, setCity] = useState("");
+const SearchCity: React.FC<SearchCityProps> = ({ onSearch }) => {
+	const [city, setCity] = useState("");
 
-    const handleSearchFormSubmit = async(e:React.FormEvent) => {
-        e.preventDefault();
+	const handleSubmit = (e: React.FormEvent) => {
+		e.preventDefault();
 
-		try {
-			handleSetWeatherRapport(await getCurrentWeather(city))
-		} catch (error) {
-			alert("City not FOUND!")
-			handleSetWeatherRapport(null)
-		}
-		setCity("")
-    };
+		// Pass `city` to parent component (App)
+		onSearch(city.trim());
 
-    const handleInputChange = (e:React.ChangeEvent<HTMLInputElement>) => {
-        setCity(e.target.value);
-    };
+		// Clear `city` state
+		setCity("");
+	};
 
-    return (
-        <div id="search-wrapper">
-            <form id="search-form" onSubmit={handleSearchFormSubmit}>
-                <div className="input-group">
-                    <input
-                        type="text"
-                        className="form-control"
-                        placeholder="Enter city to search for"
-                        aria-label="City"
-                        aria-details="Search for city to show current weather for."
-                        value={city} 
-                        onChange={handleInputChange}
-						required
-						pattern="^(?=.{3,})\S+(?:\s+\S+)*$"
-                    />
+	return (
+		<div id="search-wrapper">
+			<form onSubmit={handleSubmit} id="search-form">
+				<div className="input-group">
+					<input
+						type="text"
+						className="form-control"
+						placeholder="Enter city to search for"
+						aria-label="City"
+						aria-details="Search for city to show current weather for."
+						onChange={(e) => setCity(e.target.value)}
+						value={city}
+					/>
 
-                    <button type="submit" className="btn btn-success">
-                        🔍
-                    </button>
-                </div>
-            </form>
-        </div>
-    );
+					<button disabled={city.trim().length < 3} type="submit" className="btn btn-success">
+						🔍
+					</button>
+				</div>
+				{city.length < 3 && city !== "" && (
+					<span className="text-white">You need to be atleast 3 nonspace chars long to take this ride!</span>
+				)}
+			</form>
+		</div>
+	);
 };
 
 export default SearchCity;
